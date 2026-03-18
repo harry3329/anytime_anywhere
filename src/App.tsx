@@ -12,12 +12,12 @@ const App: React.FC = () => {
   // State
   const [userId, setUserId] = useState('');
   const [userCity, setUserCity] = useState('');
-  
+
   const [isRolling, setIsRolling] = useState(false);
   const [result, setResult] = useState<AdventureResult | null>(null);
   const [rollText, setRollText] = useState('...');
-  const [history, setHistory] = useState<{town: AdventureResult, time: string, uid: string, city: string}[]>([]);
-  
+  const [history, setHistory] = useState<{ town: AdventureResult, time: string, uid: string, city: string }[]>([]);
+
   // 開始抽籤
   const startAdventure = () => {
     if (!userId || !userCity) {
@@ -27,7 +27,7 @@ const App: React.FC = () => {
 
     // 1. 過濾鄉鎮
     const validTowns = filterTowns(userCity, excludeNeighbors);
-    
+
     if (validTowns.length === 0) {
       alert("沒有可用的鄉鎮！(可能是過濾條件太嚴格)");
       return;
@@ -47,14 +47,14 @@ const App: React.FC = () => {
 
       if (rolls >= maxRolls) {
         clearInterval(rollInterval);
-        
+
         // 3. 決定最終結果
         const finalTown = pickRandomTown(validTowns);
         if (finalTown) {
           setResult(finalTown);
           setIsRolling(false);
           playSuccessSound();
-          
+
           const nowStr = new Date().toLocaleTimeString('zh-TW', { hour12: false });
           setHistory(prev => [{ town: finalTown, time: nowStr, uid: userId, city: userCity }, ...prev]);
 
@@ -67,7 +67,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-black bg-[radial-gradient(#333_1px,transparent_1px)] bg-[size:20px_20px]">
-      
+
       {/* 標題區 */}
       <h1 className="text-2xl md:text-5xl text-retro-accent mb-8 text-center leading-relaxed font-bold tracking-widest flex justify-center items-center">
         <Footprints className="inline-block mr-4 w-8 h-8 md:w-12 md:h-12 text-retro-accent" />
@@ -75,7 +75,7 @@ const App: React.FC = () => {
       </h1>
 
       <div className="w-full max-w-lg space-y-8">
-        
+
         {/* 輸入卡片 (Login) */}
         <div className="panel-8bit space-y-6">
           <h2 className="text-xl text-retro-primary border-b-2 border-retro-border pb-2">
@@ -88,8 +88,8 @@ const App: React.FC = () => {
                 <User className="inline w-4 h-4 mr-2" />
                 User ID
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 placeholder="Name..."
@@ -102,7 +102,7 @@ const App: React.FC = () => {
                 <MapPin className="inline w-4 h-4 mr-2" />
                 目前居住縣市
               </label>
-              <select 
+              <select
                 value={userCity}
                 onChange={(e) => setUserCity(e.target.value)}
                 className="w-full bg-black border-2 border-retro-border text-retro-text p-3 font-pixel focus:border-retro-primary focus:outline-none appearance-none"
@@ -113,7 +113,7 @@ const App: React.FC = () => {
                 ))}
               </select>
             </div>
-            
+
             <p className="text-xs text-gray-400 mt-2">
               系統將自動濾除{excludeNeighbors ? '居住地與鄰近縣市' : '你的居住縣市'}
             </p>
@@ -122,7 +122,7 @@ const App: React.FC = () => {
 
         {/* 核心按鈕 */}
         <div className="text-center">
-          <button 
+          <button
             onClick={startAdventure}
             disabled={isRolling}
             className={`btn-8bit w-full py-6 text-xl ${isRolling ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -135,29 +135,29 @@ const App: React.FC = () => {
         {(isRolling || result) && (
           <div className="panel-8bit text-center border-retro-accent animate-pulse-slow">
             <p className="text-sm text-gray-400 mb-4">-- TARGET DESTINATION --</p>
-            
+
             {isRolling ? (
               <div className="text-2xl md:text-3xl text-retro-text h-32 flex items-center justify-center">
                 {rollText}
               </div>
             ) : result ? (
               <div className="animate-bounce-short">
-                <a 
+                <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result.city + result.name)}`}
-                  target="_blank" 
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="block text-3xl md:text-4xl text-retro-accent mb-6 hover:text-white transition-colors hover:underline flex items-center justify-center"
                 >
                   <span>{result.city} <ArrowRight className="inline mx-2" /> {result.name}</span>
                   <Map className="inline-block ml-3 w-8 h-8 md:w-10 md:h-10 text-gray-400 group-hover:text-white" />
                 </a>
-                
+
                 <div className="flex justify-center mb-4">
                   <div className="bg-white p-2 border-4 border-retro-primary w-32 h-32 md:w-48 md:h-48">
                     {/* Dicebear Pixel Art API (Unsplash APIs are often blocked/deprecated) */}
-                    <img 
-                      src={getTownImageUrl(result.name + result.city + userId)} 
-                      alt="Pixel Avatar" 
+                    <img
+                      src={getTownImageUrl(result.name + result.city + userId)}
+                      alt="Pixel Avatar"
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -167,12 +167,12 @@ const App: React.FC = () => {
                 {result.desc && (
                   <div className="bg-gray-800 text-left p-4 border-4 border-white mt-6 relative mx-auto max-w-sm rounded">
                     <div className="absolute -top-3 left-4 bg-black px-2 text-xs text-retro-accent">INFO</div>
-                    <p className="text-sm md:text-base leading-relaxed text-gray-200" style={{fontFamily: '微軟正黑體, sans-serif'}}>
+                    <p className="text-sm md:text-base leading-relaxed text-gray-200" style={{ fontFamily: '微軟正黑體, sans-serif' }}>
                       {result.desc}
                     </p>
                   </div>
                 )}
-                
+
                 <p className="text-xs text-retro-secondary mt-6 font-pixel">&gt;&gt; LEVEL UP !</p>
               </div>
             ) : null}
@@ -180,7 +180,7 @@ const App: React.FC = () => {
         )}
 
         {/* 歷史紀錄區 */}
-        { इतिहास() }
+        {इतिहास()}
       </div>
     </div>
   );
@@ -195,9 +195,9 @@ const App: React.FC = () => {
             <li key={idx} className="flex flex-col text-sm bg-gray-900 p-4 border border-gray-700 hover:border-retro-primary transition-colors">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-gray-400 text-xs md:text-sm">[{record.time}]</span>
-                <a 
+                <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(record.town.city + record.town.name)}`}
-                  target="_blank" 
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-retro-accent text-base md:text-lg hover:text-white transition-colors flex items-center gap-2 group"
                 >
